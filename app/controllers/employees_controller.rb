@@ -1,6 +1,6 @@
 class EmployeesController < ApplicationController
     def index
-        @employees = Unirest.get("localhost:3000/api/v2/employees.json").body
+        @employees = Employee.all
     end
 
     def new
@@ -8,17 +8,38 @@ class EmployeesController < ApplicationController
     end
 
     def create
-        employee = Unirest.post(
-                                "localhost:3000/api/v2/employees.json?first_name=#{params[:first_name]}&last_name=#{params[:last_name]}&email=#{params[:email]}",
-                                headers: {
-                                            "Accept" => "application/json"
-                                        },
-            
-                                ).body
-        redirect_to "/employees/#{employee["id"]}"
+        employee = Employee.create(
+                                    first_name: params[:first_name],
+                                    last_name: params[:last_name],
+                                    email: params[:email]
+                                    )
+
+        redirect_to "/employees/#{employee.id}"
     end
 
     def show
-        @employee = Unirest.get("localhost:3000/api/v2/employees/#{ params[:id] }.json").body
+        @employee = Employee.find(params[:id])
+    end
+
+    def edit
+        @employee = Employee.find(params[:id])   
+    end
+
+    def update
+        employee = Employee.find(params[:id])
+        employee = Employee.update(
+                                    first_name: params[:first_name],
+                                    last_name: params[:last_name],
+                                    email: params[:email]
+                                    )
+
+        redirect_to "/employees/#{employee.id}"
+    end
+
+    def destroy
+        employee = Employee.find(params[:id])
+        employee.destroy
+        
+        redirect_to "/employees"
     end
 end
